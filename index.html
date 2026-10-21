@@ -17,14 +17,14 @@ h1 span{color:var(--accent)}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .grid2{display:grid;grid-template-columns:1fr;gap:18px}
 label.h{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:10px}
-textarea{width:100%;min-height:110px;resize:vertical;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font:inherit;font-size:17px;line-height:1.5;outline:none;transition:border-color .15s}
+textarea{width:100%;min-height:110px;resize:vertical;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font:inherit;font-family:"YaVeenPUA",Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.5;outline:none;transition:border-color .15s}
 textarea:focus{border-color:var(--accent)}
 .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
 .seg{display:inline-flex;background:var(--panel2);border:1px solid var(--line);border-radius:999px;padding:3px}
-.seg button{border:0;background:transparent;color:var(--muted);padding:7px 14px;border-radius:999px;font:inherit;font-size:13px;cursor:pointer}
+.seg button{border:0;background:transparent;color:var(--muted);padding:7px 14px;min-height:38px;border-radius:999px;font:inherit;font-size:13px;cursor:pointer;touch-action:manipulation}
 .seg button.on{background:var(--accent);color:#fff}
 .actions{display:flex;flex-wrap:wrap;gap:8px}
-.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:9px 14px;border-radius:10px;font:inherit;font-size:13px;cursor:pointer;transition:all .15s}
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 15px;min-height:44px;border-radius:10px;font:inherit;font-size:14px;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .btn:hover{border-color:var(--accent);color:#fff}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
 .btn.primary:hover{background:var(--accent2)}
@@ -48,6 +48,31 @@ textarea:focus{border-color:var(--accent)}
 #numinfo.on{display:block}
 .modes{margin-bottom:10px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .hint{font-size:12px;color:var(--muted)}
+.sharebar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:16px 0 8px}
+.btn.big{font-size:16px;font-weight:650;padding:13px 22px;min-height:52px;border-radius:12px}
+.sharehint{font-size:12px;color:var(--muted);margin:0 0 14px}
+#out.inklight{background:#15171c;color:#f3f1ea}
+#decwrap{display:none;margin-top:16px}
+#out{margin-bottom:0}
+#decwrap.on{display:block}
+.dechead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.dechead label.h{margin:0}
+#decoded{background:#fff;color:#111;border:2px solid var(--accent);border-radius:14px;padding:18px 20px;font-size:22px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;min-height:64px;user-select:text;-webkit-user-select:text}
+.steps{margin:12px 0 0;padding-left:20px;color:var(--text);font-size:14px;line-height:1.6}
+.steps li{margin-bottom:6px}
+.steps b{color:var(--accent2)}
+@media (max-width:640px){
+ .wrap{padding:24px 14px 50px}
+ h1{font-size:26px}
+ .card{padding:16px}
+ .sharebar .btn.big{flex:1 1 100%}
+ .sharebar .btn{flex:1 1 auto}
+ .toolbar{flex-direction:column;align-items:stretch}
+ .toolbar .actions .btn{flex:1 1 auto}
+ #sizes{align-self:flex-start}
+ #out{padding:20px}
+ textarea{min-height:90px}
+}
 .foot{color:var(--muted);font-size:12px;margin-top:22px;line-height:1.6}
 .foot code{background:var(--panel2);padding:1px 6px;border-radius:5px}
 </style>
@@ -58,14 +83,27 @@ textarea:focus{border-color:var(--accent)}
   <div class="grid2">
     <div class="card">
       <div class="modes">
-        <div class="seg" id="modes"><button data-m="text" class="on">Text</button><button data-m="numbers">Numbers</button></div>
+        <div class="seg" id="modes"><button data-m="text" class="on">Text</button><button data-m="numbers">Numbers</button><button data-m="decode">Read YaVeen</button></div>
         <div class="seg" id="bases" style="display:none"><button data-b="12" class="on">Dozenal (native)</button><button data-b="10">Decimal mode</button></div>
+        <div class="seg" id="digmodes" style="display:none" title="How to read plain digits 0–9 in pasted text. Numbers containing YaVeen ten/eleven, point or operator signs are always read as dozenal."><button data-d="keep" class="on">Digits as typed</button><button data-d="doz">Digits are dozenal</button></div>
         <span class="hint" id="modehint">Type English — capitals and lowercase are different YaVeen letters.</span>
       </div>
       <label class="h" for="inp" id="inplabel">English</label>
       <textarea id="inp" placeholder="Type something…" spellcheck="false">Hello Scott, welcome to YaVeen.</textarea>
     </div>
     <div class="card">
+      <div id="out"></div>
+      <div id="decwrap">
+        <div class="dechead"><label class="h" for="decoded">In English</label><button class="btn primary" id="copyDec">Copy English</button></div>
+        <div id="decoded"></div>
+      </div>
+      <div class="sharebar">
+        <button class="btn primary big" id="copyImg">Copy symbols (image)</button>
+        <button class="btn" id="share">Share…</button>
+        <div class="seg" id="inks" title="Ink colour of the image"><button data-i="dark" class="on">Dark ink</button><button data-i="light">Light ink</button></div>
+        <div class="seg" id="bgs" title="Image background"><button data-g="solid" class="on">Solid</button><button data-g="clear">Transparent</button></div>
+      </div>
+      <p class="sharehint">Copies your YaVeen as a picture, so it looks like your symbols anywhere you paste it: iMessage, Notes, Instagram, email. Use <b>Light ink</b> for dark-mode chats.</p>
       <div class="toolbar">
         <div class="seg" id="sizes">
           <button data-s="32">S</button><button data-s="56" class="on">M</button><button data-s="84">L</button><button data-s="128">XL</button>
@@ -73,10 +111,9 @@ textarea:focus{border-color:var(--accent)}
         <div class="actions">
           <button class="btn" id="copyPua" title="Copies Private Use Area characters (capitals U+E000–U+E019, lowercase U+E020–U+E039, digits ten/eleven U+E040–U+E041). They show as YaVeen symbols anywhere the font is installed.">Copy as private-use characters</button>
           <button class="btn" id="copyPlain">Copy plain text</button>
-          <button class="btn primary" id="png">Download as PNG</button>
+          <button class="btn" id="png">Download as PNG</button>
         </div>
       </div>
-      <div id="out"></div>
       <div id="numinfo"></div>
     </div>
   </div>
@@ -90,13 +127,32 @@ textarea:focus{border-color:var(--accent)}
     <div class="nums" id="digits"></div>
     <div class="nums" id="ops"></div>
   </div>
+  <div class="card ref" id="fontsec">
+    <label class="h">Use the font in apps</label>
+    <div class="explain">The <b>Copy symbols (image)</b> button works everywhere. To <i>type</i> in YaVeen inside apps, install the font:</div>
+    <div class="actions">
+      <a class="btn primary" href="yaveen.otf" download>Download yaveen.otf</a>
+      <a class="btn" href="yaveen.mobileconfig">iPhone font profile (.mobileconfig)</a>
+      <a class="btn" href="yaveen.ttf" download>yaveen.ttf</a>
+    </div>
+    <ul class="steps">
+      <li><b>iPhone, profile:</b> open this page in Safari, tap <i>iPhone font profile</i> and choose Allow. Then open <i>Settings → Profile Downloaded</i> (or <i>General → VPN &amp; Device Management</i>) and tap Install. iOS asks you to approve it and marks it “Not Verified” because it is unsigned. That is expected.</li>
+      <li><b>iPhone, app:</b> or download <i>yaveen.otf</i> and open it in a font-installer app such as iFont, then install it from there.</li>
+      <li>Then pick <b>YaVeen</b> in the font menu of Pages, Keynote, Word and other apps with a font picker. Messages, Notes and social apps can’t use custom fonts, so use <b>Copy symbols (image)</b> there. To remove the font, go to <i>Settings → General → VPN &amp; Device Management</i>.</li>
+    </ul>
+  </div>
   <div class="foot">Install <code>yaveen.ttf</code> or <code>yaveen.otf</code> and any English text set in the YaVeen font appears as YaVeen letters: A–Z give the drawn capitals, a–z the lowercase. Private Use Area: capitals <code>U+E000</code>–<code>U+E019</code>, lowercase <code>U+E020</code>–<code>U+E039</code>, digit ten <code>U+E040</code>, eleven <code>U+E041</code>, dozenal point <code>U+E042</code>, negative sign <code>U+E043</code>, + − × ÷ = at <code>U+E044</code>–<code>U+E048</code>.<br>
 <b>Numbers:</b> typing ASCII digits 0–9 in the font only swaps each digit for a YaVeen digit glyph; it does <b>not</b> convert the value to base 12 (so typing “12” shows one-two, which in YaVeen means fourteen). Use the Numbers mode above to convert decimal values properly.</div>
 </div>
 <div class="toast" id="toast"></div>
 <script>
 const inp=document.getElementById('inp'),out=document.getElementById('out'),toast=document.getElementById('toast'),numinfo=document.getElementById('numinfo');
-let size=56, mode='text', base=12;
+let size=56, mode='text', base=12, ink='dark', bgMode='solid', digMode='keep';
+const decoded=document.getElementById('decoded'),decwrap=document.getElementById('decwrap');
+// PUA-only copy of the font so pasted private-use YaVeen shows as symbols in the input box while English stays normal
+(async()=>{try{const rule=[...document.styleSheets[0].cssRules].find(r=>r.type===5);const m=rule.style.getPropertyValue('src').match(/url\(\s*["']?(data:[^"')]+)/);
+  const buf=await (await fetch(m[1])).arrayBuffer();const ff=new FontFace('YaVeenPUA',buf,{unicodeRange:'U+E000-E048, U+218A-218B'});await ff.load();document.fonts.add(ff);}catch(e){}})();
+const fontReady=document.fonts?document.fonts.load('64px "YaVeen"').then(()=>document.fonts.ready).catch(()=>{}):Promise.resolve();
 const TEN='\uE040',ELEVEN='\uE041',RADIX='\u00B7',NEG='\uE043';
 // ---------- exact rational arithmetic (BigInt) ----------
 const bgcd=(a,b)=>{a=a<0n?-a:a;b=b<0n?-b:b;while(b){[a,b]=[b,a%b];}return a;};
@@ -174,15 +230,47 @@ function convertNumbers(text){
   return {yv:lines.map(l=>l.yv).join('\n'), info:lines.map(l=>l.info).filter(Boolean).join('\n')};
 }
 function currentOutput(){ if(mode==='numbers') return convertNumbers(inp.value).yv; return inp.value; }
+// ---------- decode: pasted YaVeen -> English ----------
+const DZ={'\uE040':10,'\uE041':11,'\u218A':10,'\u218B':11};
+const DOPS={'\uE042':'.','\uE043':'-','\uE044':'+','\uE045':'\u2212','\uE046':'\u00D7','\uE047':'\u00F7','\uE048':'='};
+const NUMRE=/(\uE043)?([0-9\uE040\uE041\u218A\u218B]+)(?:[\u00B7\uE042]([0-9\uE040\uE041\u218A\u218B]+))?(\u2026)?/g;
+const dzv=c=>c in DZ?DZ[c]:c.charCodeAt(0)-48;
+const dzl=s=>[...s].map(c=>{const v=dzv(c);return v<10?String(v):(v===10?'X':'E');}).join('');
+function fromPuaLetters(t){return t.replace(/[\uE000-\uE019]/g,c=>String.fromCharCode(65+c.charCodeAt(0)-0xE000)).replace(/[\uE020-\uE039]/g,c=>String.fromCharCode(97+c.charCodeAt(0)-0xE020));}
+function decodeLine(line,info){
+  line=fromPuaLetters(line);
+  // a line is read as dozenal if it carries any YaVeen-only number sign, or if the user says plain digits are dozenal
+  const doz=digMode==='doz'||/[\uE040-\uE048\u218A\u218B]/.test(line)||/\d\u00B7\d/.test(line);
+  if(doz){
+    line=line.replace(NUMRE,(m,neg,ip,fp,ell)=>{
+      let q=Q(0n); for(const c of ip) q=Q(q.n*12n+BigInt(dzv(c))*q.d,q.d);
+      if(fp){let p=12n; for(const c of fp){q=qadd(q,Q(BigInt(dzv(c)),p));p*=12n;}}
+      if(neg) q=Q(-q.n,q.d);
+      const dec=decStr(q)+(ell?'\u2026':'');
+      const lat=(neg?'\u2212':'')+dzl(ip)+(fp?'\u00B7'+dzl(fp):'')+(ell?'\u2026':'');
+      info.push(lat+' (dozenal) = '+dec+' (decimal)');
+      return (neg?'-':'')+dec.replace(/^-/,'')+'';
+    });
+  } else {
+    line=line.replace(/[\uE040\uE041\u218A\u218B]/g,c=>dzv(c)===10?'X':'E');
+  }
+  return line.replace(/[\uE042-\uE048]/g,c=>DOPS[c]);
+}
+function decodeYaVeen(text){const info=[];const t=text.split('\n').map(l=>decodeLine(l,info)).join('\n');return {text:t,info:info.join('\n')};}
+
 function render(){
   const t=inp.value;
-  if(!t.trim()){out.textContent=mode==='numbers'?'Type a decimal number or a sum like 23+19.':'Your YaVeen text will appear here.';out.classList.add('empty');numinfo.classList.remove('on');}
+  decwrap.classList.toggle('on',mode==='decode');
+  out.classList.toggle('inklight',ink==='light');
+  if(!t.trim()){out.textContent=mode==='numbers'?'Type a decimal number or a sum like 23+19.':(mode==='decode'?'Paste YaVeen above to see it in symbols and in English.':'Your YaVeen text will appear here.');out.classList.add('empty');numinfo.classList.remove('on');decoded.textContent='';}
   else{
     if(mode==='numbers'){const r=convertNumbers(t); out.textContent=r.yv; numinfo.textContent=r.info; numinfo.classList.toggle('on',!!r.info);}
+    else if(mode==='decode'){const r=decodeYaVeen(t); out.textContent=t; decoded.textContent=r.text; numinfo.textContent=r.info; numinfo.classList.toggle('on',!!r.info);}
     else{out.textContent=t; numinfo.classList.remove('on');}
     out.classList.remove('empty');
   }
   out.style.fontSize=size+'px';
+  scheduleImage();
 }
 function toPua(t){return t.replace(/[A-Z]/g,c=>String.fromCharCode(0xE000+c.charCodeAt(0)-65)).replace(/[a-z]/g,c=>String.fromCharCode(0xE020+c.charCodeAt(0)-97));}
 function say(m){toast.textContent=m;toast.classList.add('show');clearTimeout(say.t);say.t=setTimeout(()=>toast.classList.remove('show'),1600);}
@@ -192,30 +280,37 @@ async function copy(s,msg){
   say(msg);
 }
 document.getElementById('copyPua').onclick=()=>copy(toPua(currentOutput()),'Copied private-use characters');
-document.getElementById('copyPlain').onclick=()=>copy(mode==='numbers'?(convertNumbers(inp.value).info||inp.value):inp.value,'Copied plain text');
+document.getElementById('copyPlain').onclick=()=>copy(mode==='numbers'?(convertNumbers(inp.value).info||inp.value):(mode==='decode'?decodeYaVeen(inp.value).text:inp.value),'Copied plain text');
+document.getElementById('copyDec').onclick=()=>copy(decodeYaVeen(inp.value).text,'Copied the English');
 document.querySelectorAll('#sizes button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('#sizes button').forEach(x=>x.classList.remove('on'));b.classList.add('on');size=+b.dataset.s;render();});
+const HINTS={text:'Type English — capitals and lowercase are different YaVeen letters.',numbers:'e.g. 2026, 144/4, 23+19, -7+12, 1/3',decode:'Paste YaVeen characters (e.g. from “Copy as private-use characters”) or any text — see it in symbols and in English.'};
+const LABELS={text:'English',numbers:'Decimal numbers or sums',decode:'Pasted YaVeen'};
 function setMode(m){
+  const prev=mode;
+  if(m==='decode'&&prev!=='decode'&&inp.value.trim()) inp.value=toPua(currentOutput());
+  if(prev==='decode'&&m!=='decode') inp.value=decodeYaVeen(inp.value).text;
   mode=m; document.querySelectorAll('#modes button').forEach(x=>x.classList.toggle('on',x.dataset.m===m));
   document.getElementById('bases').style.display=m==='numbers'?'':'none';
-  document.getElementById('inplabel').textContent=m==='numbers'?'Decimal numbers or sums':'English';
-  document.getElementById('modehint').textContent=m==='numbers'?'e.g. 2026, 144/4, 23+19, -7+12, 1/3':'Type English — capitals and lowercase are different YaVeen letters.';
+  document.getElementById('digmodes').style.display=m==='decode'?'':'none';
+  document.getElementById('inplabel').textContent=LABELS[m];
+  document.getElementById('modehint').textContent=HINTS[m];
+  inp.placeholder=m==='decode'?'Paste YaVeen here…':'Type something…';
   if(m==='numbers'&&!/\d/.test(inp.value)) inp.value='23+19';
   if(m==='text'&&/^[\d\s+\-*\/x().=]*$/.test(inp.value)) inp.value='Hello Scott, welcome to YaVeen.';
   render();
 }
 document.querySelectorAll('#modes button').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+document.querySelectorAll('#digmodes button').forEach(b=>b.onclick=()=>{digMode=b.dataset.d;document.querySelectorAll('#digmodes button').forEach(x=>x.classList.toggle('on',x===b));render();});
+document.querySelectorAll('#inks button').forEach(b=>b.onclick=()=>{ink=b.dataset.i;document.querySelectorAll('#inks button').forEach(x=>x.classList.toggle('on',x===b));render();});
+document.querySelectorAll('#bgs button').forEach(b=>b.onclick=()=>{bgMode=b.dataset.g;document.querySelectorAll('#bgs button').forEach(x=>x.classList.toggle('on',x===b));render();});
 document.querySelectorAll('#bases button').forEach(b=>b.onclick=()=>{base=+b.dataset.b;document.querySelectorAll('#bases button').forEach(x=>x.classList.toggle('on',x===b));render();});
 inp.addEventListener('input',render);
 
-document.getElementById('png').onclick=async()=>{
-  const text=inp.value.trim()?currentOutput():'';
-  if(!text){say('Nothing to export');return;}
-  await document.fonts.load(size+'px "YaVeen"');await document.fonts.ready;
-  const scale=2,pad=Math.round(size*0.6),lh=Math.round(size*1.35);
-  const maxW=Math.max(out.clientWidth-56,size*4);
-  const c=document.createElement('canvas'),ctx=c.getContext('2d');
-  const font=size+'px "YaVeen", sans-serif';ctx.font=font;
+// ---------- image rendering (shared by Copy image, Share, Download PNG) ----------
+function imageText(){return inp.value.trim()?currentOutput():'';}
+function imageKey(text){return [text,ink,bgMode,size].join('\u0001');}
+function wrapLines(ctx,text,maxW){
   const lines=[];
   for(const para of text.split('\n')){
     const words=para.split(/(\s+)/);let line='';
@@ -230,14 +325,71 @@ document.getElementById('png').onclick=async()=>{
     }
     lines.push(line);
   }
-  const w=Math.ceil(Math.max(...lines.map(l=>ctx.measureText(l).width),size))+pad*2;
+  return lines;
+}
+function drawCanvas(text){
+  const fs=Math.max(size,64),pad=Math.round(fs*0.6),lh=Math.round(fs*1.35),maxW=fs*12;
+  const c=document.createElement('canvas'),ctx=c.getContext('2d');
+  const font=fs+'px "YaVeen", sans-serif';ctx.font=font;
+  const lines=wrapLines(ctx,text,maxW);
+  const w=Math.ceil(Math.max(...lines.map(l=>ctx.measureText(l).width),fs))+pad*2;
   const h=lines.length*lh+pad*2;
-  c.width=w*scale;c.height=h*scale;
-  ctx.scale(scale,scale);ctx.fillStyle='#fbfaf7';ctx.fillRect(0,0,w,h);
-  ctx.fillStyle='#111';ctx.font=font;ctx.textBaseline='alphabetic';
-  lines.forEach((l,i)=>ctx.fillText(l,pad,pad+i*lh+size*0.9));
-  c.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='yaveen.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000);say('PNG downloaded');},'image/png');
+  // high resolution, but stay inside iOS canvas limits (~16.7 MP, 4096 px side is safe)
+  const scale=Math.max(0.25,Math.min(3,4096/w,4096/h,Math.sqrt(16e6/(w*h))));
+  c.width=Math.round(w*scale);c.height=Math.round(h*scale);
+  ctx.scale(scale,scale);
+  if(bgMode==='solid'){ctx.fillStyle=ink==='light'?'#15171c':'#ffffff';ctx.fillRect(0,0,w,h);}
+  ctx.fillStyle=ink==='light'?'#f3f1ea':'#111111';ctx.font=font;ctx.textBaseline='alphabetic';
+  lines.forEach((l,i)=>ctx.fillText(l,pad,pad+i*lh+fs*0.9));
+  return c;
+}
+async function makeBlob(text){
+  await fontReady;
+  const c=drawCanvas(text);
+  return new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('PNG render failed')),'image/png'));
+}
+// keep a ready-made PNG so Share/Copy can run synchronously inside the tap (iOS Safari needs that)
+const imgCache={key:'',blob:null,file:null};
+function scheduleImage(){
+  clearTimeout(scheduleImage.t);
+  scheduleImage.t=setTimeout(()=>{const text=imageText();if(!text)return;const key=imageKey(text);if(imgCache.key===key)return;
+    makeBlob(text).then(b=>{if(imageKey(imageText())!==key)return;imgCache.key=key;imgCache.blob=b;imgCache.file=new File([b],'yaveen.png',{type:'image/png'});}).catch(()=>{});},250);
+}
+function blobPromise(text){const key=imageKey(text);return imgCache.key===key&&imgCache.blob?Promise.resolve(imgCache.blob):makeBlob(text);}
+function downloadBlob(b){const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='yaveen.png';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);}
+document.getElementById('png').onclick=async()=>{
+  const text=imageText();
+  if(!text){say('Nothing to export');return;}
+  downloadBlob(await blobPromise(text));say('PNG downloaded');
 };
+function copyImage(){
+  const text=imageText();
+  if(!text){say('Nothing to copy');return;}
+  const done=()=>say('Copied! Paste it anywhere');
+  const fail=e=>{console.warn('image copy failed',e);say('Couldn’t copy the image here. Try Share or Download.');};
+  if(!(navigator.clipboard&&navigator.clipboard.write&&window.ClipboardItem)){
+    blobPromise(text).then(b=>{downloadBlob(b);say('Image copy isn’t supported here, so the PNG was downloaded');}).catch(fail);return;
+  }
+  // Pass the Blob *promise* straight to ClipboardItem and call write() synchronously in the tap,
+  // so iOS Safari keeps the user gesture while the PNG renders.
+  const p=blobPromise(text);
+  let item=null;try{item=new ClipboardItem({'image/png':p});}catch(e){item=null;}
+  const retry=()=>p.then(b=>navigator.clipboard.write([new ClipboardItem({'image/png':b})])); // older Chromium: no promise values
+  (item?navigator.clipboard.write([item]).catch(retry):retry()).then(done).catch(fail);
+}
+document.getElementById('copyImg').onclick=copyImage;
+async function shareImage(){
+  const text=imageText();
+  if(!text){say('Nothing to share');return;}
+  const key=imageKey(text);
+  let file=imgCache.key===key?imgCache.file:null;
+  if(!file){const b=await makeBlob(text);file=new File([b],'yaveen.png',{type:'image/png'});}
+  if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file]});}
+    catch(e){if(e.name==='AbortError')return;if(e.name==='NotAllowedError'){say('Tap Share again');scheduleImage();return;}downloadBlob(file);say('PNG downloaded');}
+  } else {downloadBlob(file);say('Sharing isn’t available here, so the PNG was downloaded');}
+}
+document.getElementById('share').onclick=shareImage;
 function insert(s){const a=inp.selectionStart,e=inp.selectionEnd;inp.value=inp.value.slice(0,a)+s+inp.value.slice(e);inp.selectionStart=inp.selectionEnd=a+s.length;inp.focus();render();}
 const alpha=document.getElementById('alpha');
 for(let i=0;i<26;i++){
@@ -263,7 +415,8 @@ window.yaveenTest=function(){
   const cv=document.createElement('canvas').getContext('2d');
   cv.font='64px "YaVeen", monospace'; const wy=cv.measureText('Hello 2026').width;
   cv.font='64px monospace'; const wm=cv.measureText('Hello 2026').width;
-  return {fontLoaded:document.fonts.check('64px "YaVeen"'),widthYaVeen:wy,widthMonospace:wm,results:res};
+  const pua=toPua('Hello Scott');
+  return {fontLoaded:document.fonts.check('64px "YaVeen"'),widthYaVeen:wy,widthMonospace:wm,results:res,decodeHelloScott:decodeYaVeen(pua).text,decodeOk:decodeYaVeen(pua).text==='Hello Scott',decodeNumbers:decodeYaVeen(convertLine('23+19').yv+'\n'+convertLine('1/3').yv+'\n'+convertLine('-7+12').yv).text};
 };
 if(location.search.includes('selftest')){
   document.fonts.load('64px "YaVeen"').then(()=>document.fonts.ready).then(()=>{
